@@ -1,0 +1,84 @@
+﻿@page "/states/details/{Id:int}"
+
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+@if(state == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <h2>@state.Name</h2>
+    <div class="mb-2">
+        <a class="btn btn-primary" href="/city/create/@state.Id">Nueva ciudad</a>
+        <a class="btn btn-success" href="/countries/details/{Id}">Regresar</a>
+    </div>
+    <GenericList MyList="state.Cities!.ToList()">
+        <Body>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Ciudades</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var city in state.Cities!)
+                    {
+                        <tr>
+                            <td>
+                                @city.Name
+                            </td>
+                            <td>
+                                <a class="btn btn-info" href="/states/details/@state.Id">Detalles</a>
+                                <a class="btn btn-warning" href="/states/edit/@state.Id">Editar</a>
+                                <button class="btn btn-danger">Borrar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </Body>
+    </GenericList>
+}
+
+@code {
+    private Country country = null!;
+    private State? state;
+    private StateForm? stateForm;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        var responseHttp = await repository.GetAsync<State>($"/api/States/{Id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/countries/details/" + Id);
+                return;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        state = responseHttp.Response!;
+    }
+
+
+    private void Return()
+    {
+        navigationManager.NavigateTo("/countries/details/" + Id);
+    }
+}
