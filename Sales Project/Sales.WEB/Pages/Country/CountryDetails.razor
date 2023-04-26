@@ -1,0 +1,10 @@
+﻿@page "/countries/details/{Id:int}"
+
+<h3>CountryDetails</h3>
+
+<CountryForm @ref="countryForm" Country="country" OnValidSubmit="CreateAsync" ReturnAction="Return" />
+
+@code {
+    private Country country = new();
+    private CountryForm? countryForm;
+}
