@@ -1,11 +1,11 @@
-﻿@page "/countries/edit/{Id:int}"
+﻿@page "/states/edit/{Id:int}"
+
 @inject NavigationManager navigationManager
 @inject IRepository repository
 @inject SweetAlertService sweetAlertService
 
-<h3>Editar País</h3>
-
-@if (country is null)
+<h3>Editar Estado/Departamento</h3>
+@if (state is null)
 {
     <div class="align-items-center">
         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
@@ -13,19 +13,19 @@
 }
 else
 {
-    <CountryForm @ref="countryForm" Country="country" OnValidSubmit="EditAsync" ReturnAction="Return" />
+    <StateForm @ref="stateForm" State="state" OnValidSubmit="EditAsync" ReturnAction="Return" />
 }
 
 @code {
-    private Country? country;
-    private CountryForm? countryForm;
+    private State? state;
+    private StateForm? stateForm;
 
     [Parameter]
     public int Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHTTP = await repository.GetAsync<Country>($"api/countries/{Id}");
+        var responseHTTP = await repository.GetAsync<State>($"api/states/{Id}");
 
         if (responseHTTP.Error)
         {
@@ -36,25 +36,28 @@ else
             }
             var messageError = await responseHTTP.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            
+            stateForm!.FormPostedSuccessfully = false;
+            Return();
             return;
         }
-        country = responseHTTP.Response;
+        state = responseHTTP.Response;
     }
 
     private async Task EditAsync()
     {
-        var responseHTTP = await repository.PutAsync("api/countries", country);
+        var responseHTTP = await repository.PutAsync("api/states", state);
 
         if (responseHTTP.Error)
         {
             var mensajeError = await responseHTTP.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
-            
-            countryForm!.FormPostedSuccessfully = false;
+
+            stateForm!.FormPostedSuccessfully = false;
             Return();
             return;
         }
-        countryForm!.FormPostedSuccessfully = true;
+        stateForm!.FormPostedSuccessfully = true;
         Return();
         var toast = sweetAlertService.Mixin(new SweetAlertOptions
             {
@@ -63,11 +66,11 @@ else
                 ShowConfirmButton = false,
                 Timer = 5000
             });
-        await toast.FireAsync(icon: SweetAlertIcon.Success, message: "País modificado con éxito.");
+        await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Departamento modificado con éxito.");
     }
 
     private void Return()
     {
-        navigationManager.NavigateTo("countries");
+        navigationManager.NavigateTo("/countries/details/" + state.CountryId);
     }
 }

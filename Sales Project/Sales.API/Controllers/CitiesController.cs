@@ -5,6 +5,8 @@ using Sales.Shared.Entities;
 
 namespace Sales.API.Controllers
 {
+    [ApiController]
+    [Route("/api/cities")]
     public class CitiesController: ControllerBase
     {
         private readonly DataContext _context;
@@ -17,17 +19,13 @@ namespace Sales.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            return Ok(await _context.States
-                .Include(s => s.Cities)
-                .ToListAsync());
+            return Ok(await _context.Cities.ToListAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
         {
-            var state = await _context.States
-                .Include(s => s.Cities)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var state = await _context.Cities.FirstOrDefaultAsync(c => c.Id == id);
             if (state == null)
             {
                 return NotFound();
@@ -38,7 +36,7 @@ namespace Sales.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var state = await _context.States.FirstOrDefaultAsync(c => c.Id == id);
+            var state = await _context.Cities.FirstOrDefaultAsync(c => c.Id == id);
             if (state == null)
             {
                 return NotFound();
@@ -49,19 +47,19 @@ namespace Sales.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync(State state)
+        public async Task<IActionResult> PostAsync(City city)
         {
-            _context.Add(state);
+            _context.Add(city);
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(state);
+                return Ok(city);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un estado/departamento con el mismo nombre.");
+                    return BadRequest("Ya existe una ciudad con el mismo nombre.");
                 }
                 else
                 {
@@ -75,19 +73,19 @@ namespace Sales.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync(State state)
+        public async Task<IActionResult> PutAsync(City city)
         {
-            _context.Update(state);
+            _context.Update(city);
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(state);
+                return Ok(city);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un estado/departamento con el mismo nombre.");
+                    return BadRequest("Ya existe una ciudad con el mismo nombre.");
                 }
                 else
                 {

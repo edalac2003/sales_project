@@ -3,11 +3,11 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<h3>Detalle de Pais</h3>
-
 @if (country is null)
 {
-    <p>Cargando...</p>
+    <div class="align-items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
+    </div>
 }
 else
 {

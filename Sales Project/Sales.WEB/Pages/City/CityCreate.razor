@@ -1,34 +1,33 @@
-﻿@page "/states/create/{Id:int}"
+﻿@page "/cities/create/{Id:int}"
 @inject IRepository repository
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<h3>Crear Estados/Departamentos</h3>
+<h3>Crear Ciudad</h3>
 
-<StateForm @ref="stateForm" State="state" OnValidSubmit="CreateAsync" ReturnAction="Return"></StateForm>
+<CityForm @ref="cityForm" City="city" OnValidSubmit="CreateAsync" ReturnAction="Return"></CityForm>
 
 @code {
-    private State state = new();
-    private StateForm? stateForm;
+    private City city = new();
+    private CityForm? cityForm;
 
     [Parameter]
     public int Id { get; set; }
 
     private async Task CreateAsync()
     {
-        state.CountryId = Id;
-        var responseHttp = await repository.PostAsync("/api/states", state);
+        city.StateId = Id;
+        var responseHttp = await repository.PostAsync("/api/cities", city);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            
-            stateForm!.FormPostedSuccessfully = false;
-            Return();
+
+            cityForm!.FormPostedSuccessfully = true;
             return;
         }
 
-        stateForm!.FormPostedSuccessfully = true;
+        cityForm!.FormPostedSuccessfully = true;
         Return();
         var toast = sweetAlertService.Mixin(new SweetAlertOptions
             {
@@ -37,12 +36,11 @@
                 ShowConfirmButton = false,
                 Timer = 5000
             });
-        await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Estado/Departamento creado con éxito.");
+        await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Ciudad creada con éxito.");
     }
-
 
     private void Return()
     {
-        navigationManager.NavigateTo("/countries/details/"+Id);
+        navigationManager.NavigateTo($"/states/details/{Id}");
     }
 }
