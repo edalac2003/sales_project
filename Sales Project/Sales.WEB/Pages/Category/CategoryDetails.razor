@@ -1,0 +1,120 @@
+﻿@page "/categories/details/{Id:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+
+@if (category == null)
+{
+    <div class="align-items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
+    </div>
+}
+else
+{
+    <div class="container-fluid mt-3 mb-3">
+        <div class="row align-items-start">
+            <div class="col-md-10">
+                <h4>@category.Name</h4>
+            </div>
+        </div>
+    </div>
+    <div class="m-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Productos</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in products)
+                {
+                    <tr>
+                        <td width="75%">
+                            @product.Name
+                        </td>
+                        <td>
+                            <button class="btn btn-warning" @onclick=@(() => EditProduct(category.Id))>Editar</button>
+                            <button class="btn btn-info" @onclick=@(() => DetailsProduct(category.Id))>Borrar</button>
+                            <button class="btn btn-danger" @onclick=@(() => DeleteProduct(category.Id))>Borrar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="mb-2">
+        <a class="btn btn-success" href="/categories">Regresar</a>
+    </div>
+}
+
+@code {
+    private Category? category;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private List<Product> products => new List<Product>()
+        {
+            new Product() { Id = 1, Name = "Producto 1"},
+            new Product() { Id = 2, Name = "Producto 2"},
+            new Product() { Id = 3, Name = "Producto 3"},
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHTTP = await repository.GetAsync<Category>($"api/categories/{Id}");
+
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("categories");
+                return;
+            }
+            var messageError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            return;
+        }
+        category = responseHTTP.Response;
+    }
+
+
+    private void Return()
+    {
+        navigationManager.NavigateTo("/categories");
+    }
+
+
+    /*
+    * Esto es solo de pruebas
+    */
+    private void EditProduct(int IdProduct)
+    {
+        InConstrucction();
+    }
+
+    private void DetailsProduct(int IdProduct)
+    {
+        InConstrucction();
+    }
+
+    private void DeleteProduct(int IdProduct)
+    {
+        InConstrucction();
+    }
+
+    private void InConstrucction()
+    {
+        var toast = sweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.TopEnd,
+                ShowConfirmButton = false,
+                Timer = 5000
+            });
+        toast.FireAsync(icon: SweetAlertIcon.Success, message: "Esto está en Construcción.");
+
+    }
+}

@@ -13,7 +13,7 @@ builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name = LocalConn
 builder.Services.AddTransient<SeedDb>();
 
 var app = builder.Build();
-
+SeedData(app);
 
 void SeedData(WebApplication app)
 {
@@ -33,9 +33,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.UseCors(x => x

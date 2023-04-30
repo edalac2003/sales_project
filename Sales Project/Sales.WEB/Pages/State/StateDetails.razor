@@ -1,5 +1,4 @@
 ﻿@page "/states/details/{Id:int}"
-
 @inject IRepository repository
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
@@ -12,37 +11,50 @@
 }
 else
 {
-    <h2>@state.Name</h2>
-    <div class="mb-2">
-        <a class="btn btn-primary" href="/cities/create/@state.Id">Nueva ciudad</a>
-        <a class="btn btn-success" href="/countries/details/@state.CountryId">Regresar</a>
+    <div class="container-fluid mt-3">
+        <div class="row align-items-start">
+            <div class="col-md-10">
+                <h3>@state.Name</h3>
+            </div>
+            <div class="col" al>
+                <div class="mb-2">
+                    <a class="btn btn-primary" href="/cities/create/@state.Id">Nueva ciudad</a>
+                </div>
+            </div>
+        </div>
     </div>
+    
     <GenericList MyList="state.Cities!.ToList()">
         <Body>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Ciudades</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var city in state.Cities!)
-                    {
+            <div class="m-4">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td>
-                                @city.Name
-                            </td>
-                            <td>
-                                <a class="btn btn-warning" href="/cities/edit/@city.Id">Editar</a>
-                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(city.Id))>Borrar</button>
-                            </td>
+                            <th width="80%">Ciudades</th>
+                            <th></th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var city in state.Cities!)
+                        {
+                            <tr>
+                                <td>
+                                    @city.Name
+                                </td>
+                                <td>
+                                    <a class="btn btn-warning" href="/cities/edit/@city.Id">Editar</a>
+                                    <button class="btn btn-danger" @onclick=@(() => DeleteAsync(city.Id))>Borrar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>            
         </Body>
     </GenericList>
+    <div class="mt-2">
+        <a class="btn btn-success" href="/countries/details/@state.CountryId">Regresar</a>
+    </div>
 }
 
 @code {

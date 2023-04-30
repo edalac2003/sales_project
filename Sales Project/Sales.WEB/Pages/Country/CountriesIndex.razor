@@ -3,37 +3,46 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<h3>Paises</h3>
-
-<div class="mb-3">
-    <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+<div class="container-fluid mt-3 mb-3">
+    <div class="row align-items-start">
+        <div class="col-md-10">
+            <h3>Paises</h3>
+        </div>
+        <div class="col" al>
+            <div class="mb-3">
+                <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <GenericList MyList="countries">
     <Body>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>País</th>
-                    <th>Estados/Departamentos</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var country in countries!)
-                {
+        <div class="m-4">
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td>@country.Name</td>
-                        <td></td>
-                        <td>
-                            <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
-                            <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
-                            <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.Id))>Borrar</button>
-                        </td>
+                        <th width="50%" style="align" >País</th>
+                        <th width="25%">Estados/Departamentos</th>
+                        <th width="25%"></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var country in countries!)
+                    {
+                        <tr>
+                            <td width="50%">@country.Name</td>
+                            <td width="25%"></td>
+                            <td width="25%">
+                                <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
+                                <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
+                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.Id))>Borrar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>        
     </Body>
 </GenericList>
 
