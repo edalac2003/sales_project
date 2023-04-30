@@ -37,8 +37,7 @@ else
             var messageError = await responseHTTP.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
             
-            stateForm!.FormPostedSuccessfully = false;
-            Return();
+            stateForm!.FormPostedSuccessfully = true;
             return;
         }
         state = responseHTTP.Response;

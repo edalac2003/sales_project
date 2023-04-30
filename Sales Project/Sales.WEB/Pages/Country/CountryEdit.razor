@@ -50,8 +50,7 @@ else
             var mensajeError = await responseHTTP.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
             
-            countryForm!.FormPostedSuccessfully = false;
-            Return();
+            countryForm!.FormPostedSuccessfully = true;
             return;
         }
         countryForm!.FormPostedSuccessfully = true;

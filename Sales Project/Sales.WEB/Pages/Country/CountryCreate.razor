@@ -19,8 +19,7 @@
             var message = await responseHttp.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             
-            countryForm!.FormPostedSuccessfully = false;
-            Return();
+            countryForm!.FormPostedSuccessfully = true;
             return;
         }
 
@@ -33,7 +32,6 @@
                 ShowConfirmButton = false,
                 Timer = 5000
             });
-        // await toast.FireAsync(icon: SweetAlertIcon.Success, message: "País creado con éxito.");
         await toast.FireAsync(icon: SweetAlertIcon.Success, message: "País eliminado con éxito.");
     }
 

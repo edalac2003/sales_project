@@ -13,14 +13,13 @@
 
     private async Task CreateAsync()
     {
-        var responseHttp = await repository.PostAsync("/api/categories", category);
+        var responseHttp = await repository.PostAsync("/api/categories", category);        
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
 
-            categoryForm!.FormPostedSuccessfully = false;
-            Return();
+            categoryForm!.FormPostedSuccessfully = true;
             return;
         }
 

@@ -5,36 +5,55 @@
 namespace Sales.API.Migrations
 {
     /// <inheritdoc />
-    public partial class ProductCategoryAndData : Migration
+    public partial class Others : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Categories",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
-                });
+            migrationBuilder.DropTable(
+                name: "ProductCategories");
 
-            migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                });
+            migrationBuilder.DropIndex(
+                name: "IX_Products_Id",
+                table: "Products");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Categories_Id",
+                table: "Categories");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "Products",
+                type: "nvarchar(100)",
+                maxLength: 100,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(50)",
+                oldMaxLength: 50);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_Name",
+                table: "Categories",
+                column: "Name",
+                unique: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropIndex(
+                name: "IX_Categories_Name",
+                table: "Categories");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "Products",
+                type: "nvarchar(50)",
+                maxLength: 50,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(100)",
+                oldMaxLength: 100);
 
             migrationBuilder.CreateTable(
                 name: "ProductCategories",
@@ -63,9 +82,15 @@ namespace Sales.API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_Id",
+                table: "Products",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Categories_Id",
                 table: "Categories",
-                column: "Name",
+                column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -78,25 +103,6 @@ namespace Sales.API.Migrations
                 table: "ProductCategories",
                 columns: new[] { "ProductId", "CategoryId" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_Id",
-                table: "Products",
-                column: "Name",
-                unique: true);
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "ProductCategories");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "Products");
         }
     }
 }
