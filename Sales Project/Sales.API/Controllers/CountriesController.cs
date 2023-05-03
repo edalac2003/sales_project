@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.API.Data;
+using Sales.API.Helpers;
+using Sales.Shared.DTOs;
 using Sales.Shared.Entities;
 
 namespace Sales.API.Controllers
@@ -16,14 +18,6 @@ namespace Sales.API.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAsync()
-        {
-            return Ok(await _context.Countries
-                .Include(c => c.States)
-                .ToListAsync());
-        }
-
         [HttpGet("[action]")]
         public async Task<ActionResult> GetFull()
         {
@@ -33,6 +27,14 @@ namespace Sales.API.Controllers
                 .ToListAsync());
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetAsync()
+        {
+            return Ok(await _context.Countries
+                .Include(c => c.States)
+                .ToListAsync());
+        }
+        
         [HttpGet("{id}")]
         public async Task<ActionResult> GetAsync(int id)
         {
@@ -47,6 +49,19 @@ namespace Sales.API.Controllers
             return Ok(country);
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Countries
+                .Include(x => x.States)
+                .AsQueryable();
+
+            return Ok(await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync());
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
@@ -58,6 +73,15 @@ namespace Sales.API.Controllers
             _context.Remove(country);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet("totalPages")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Countries.AsQueryable();
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
         }
 
         [HttpPost]
