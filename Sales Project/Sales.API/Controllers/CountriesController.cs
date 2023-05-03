@@ -27,13 +27,13 @@ namespace Sales.API.Controllers
                 .ToListAsync());
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAsync()
-        {
-            return Ok(await _context.Countries
-                .Include(c => c.States)
-                .ToListAsync());
-        }
+        //[HttpGet]
+        //public async Task<ActionResult> GetAsync()
+        //{
+        //    return Ok(await _context.Countries
+        //        .Include(c => c.States)
+        //        .ToListAsync());
+        //}
         
         [HttpGet("{id}")]
         public async Task<ActionResult> GetAsync(int id)
@@ -49,14 +49,14 @@ namespace Sales.API.Controllers
             return Ok(country);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]
         public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
             var queryable = _context.Countries
                 .Include(x => x.States)
                 .AsQueryable();
 
-            return Ok(await queryable
+             return Ok(await queryable
                 .OrderBy(x => x.Name)
                 .Paginate(pagination)
                 .ToListAsync());
