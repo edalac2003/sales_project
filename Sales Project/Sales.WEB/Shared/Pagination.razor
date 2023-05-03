@@ -1,6 +1,6 @@
 ﻿<nav>
     <ul class="pagination">
-        @foreach(var link in Links)
+        @foreach (var link in Links)
         {
             <li @onclick=@(() => InternalSelectedPage(link)) style="cursor: pointer" class="page-item @(link.Enable ? null : "disabled") @(link.Enable ? "active" : null)">
                 <a class="page-link">@link.Text</a>
@@ -22,6 +22,7 @@
         {
             return;
         }
+
         await SelectedPage.InvokeAsync(pageModel.Page);
     }
 
@@ -32,11 +33,11 @@
         var previousLinkPage = CurrentPage - 1;
 
         Links.Add(new PageModel
-        {
-            Text = "Anterior",
-            Page = previousLinkPage,
-            Enable = previousLinkEnable
-        });
+            {
+                Text = "Anterior",
+                Page = previousLinkPage,
+                Enable = previousLinkEnable
+            });
 
         for (int i = 1; i <= TotalPages; i++)
         {
@@ -74,14 +75,12 @@
         var linkNextEnable = CurrentPage != TotalPages;
         var linkNextPage = CurrentPage != TotalPages ? CurrentPage + 1 : CurrentPage;
         Links.Add(new PageModel
-        {
-            Text = "Siguiente",
-            Page = linkNextPage,
-            Enable = linkNextEnable
-        });
+            {
+                Text = "Siguiente",
+                Page = linkNextPage,
+                Enable = linkNextEnable
+            });
     }
-
-    
 
     class PageModel
     {

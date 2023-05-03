@@ -75,7 +75,7 @@ namespace Sales.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("totalPages")]
+        [HttpGet("[action]")]
         public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
         {
             var queryable = _context.Countries.AsQueryable();
