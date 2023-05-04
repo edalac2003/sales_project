@@ -3,58 +3,83 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<div class="container-fluid mt-3 mb-3">
-    <div class="row align-items-start">
-        <div class="col-md-10">
-            <h3>Paises</h3>
+@if (countries is null)
+{
+    <div class="align-items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
+    </div>
+}
+else
+{
+    <div class="container-fluid mt-3 mb-3">
+        <div class="row align-items-start">
+            <div class="col-md-auto">
+                <h3>Paises</h3>
+            </div>
         </div>
-        <div class="col" al>
-            <div class="mb-3">
-                <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+
+    </div>
+    <div class="container-fluid mt-3 mb-3">
+        <div class="row align-items-start">
+            <div class="d-flex flex-row">
+                <div class="mb-3">
+                    <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+                </div>
+            </div>
+            <div class="col-md-7 align-items-end">
+                <div>
+                    <input style="width: 300px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
+                </div>                
+            </div>
+            <div class="col-md-3 align-items-start">
+                <div>
+                    <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+                    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<GenericList MyList="countries">
-    <Body>
-        <div class="m-4">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th width="50%" style="align" >País</th>
-                        <th width="25%">Estados/Departamentos</th>
-                        <th width="25%"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var country in countries!)
-                    {
+    <GenericList MyList="countries">
+        <Body>
+            <div class="m-4">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td width="50%">@country.Name</td>
-                            <td width="25%"></td>
-                            <td width="25%">
-                                <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
-                                <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
-                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.Id))>Borrar</button>
-                            </td>
+                            <th width="50%">País</th>
+                            <th width="25%" style="text-align:center">Estados/Departamentos</th>
+                            <th width="25%" style="text-align:center">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>        
-    </Body>
-</GenericList>
-<div class="container-fluid" ml-3 mr-3>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-            <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
+                    </thead>
+                    <tbody>
+                        @foreach (var country in countries!)
+                        {
+                            <tr>
+                                <td width="50%">@country.Name</td>
+                                <td width="25%" style="text-align:center">@country.StatesNumber</td>
+                                <td width="25%">
+                                    <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
+                                    <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
+                                    <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.Id))>Borrar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </Body>
+    </GenericList>
+    <div class="container-fluid" ml-3 mr-3>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-8">
+                <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
+            </div>
+            <div class="col-md-auto"></div>
         </div>
-        <div class="col-md-2"></div>
     </div>
-</div>
+}
+
 
 
 @code {
@@ -65,6 +90,10 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public string Page { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -159,5 +188,19 @@
                 Timer = 5000
             });
         await toast.FireAsync(icon: SweetAlertIcon.Success, message: "País eliminado con éxito.");
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        int page = 1;
+        await LoadTotalPagesAsync();
+        await LoadAsync(page);
+        await SelectedPage(page);
     }
 }
