@@ -19,7 +19,20 @@ else
         </div>
 
     </div>
-    <div class="container-fluid mt-3 mb-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                <button class="btn btn-primary">Nuevo País</button>
+            </div>
+            <div class="col-3"></div>
+            <div class="col-6">
+                <input type="text" style="width: 300px" placeholder="Algo aqui..." />
+                <button type="button" class="btn btn-outline-warning">Filtrar</button>
+                <button type="button" class="btn btn-outline-info">Limpiar</button>
+            </div>
+        </div>
+    </div>
+    @*<div class="container mt-3 mb-3">
         <div class="row align-items-start">
             <div class="d-flex flex-row">
                 <div class="mb-3">
@@ -39,7 +52,7 @@ else
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
 
     <GenericList MyList="countries">
         <Body>
