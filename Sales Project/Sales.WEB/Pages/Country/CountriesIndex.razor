@@ -26,13 +26,14 @@ else
                     <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
                 </div>
             </div>
-            <div class="col-md-7 align-items-end">
+            <div class="col-md-auto align-items-end">
                 <div>
-                    <input style="width: 300px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
+                    
                 </div>                
             </div>
-            <div class="col-md-3 align-items-start">
+            <div class="col-md-6 align-items-start">
                 <div>
+                    <input style="width: 300px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
                     <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
                     <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
                 </div>

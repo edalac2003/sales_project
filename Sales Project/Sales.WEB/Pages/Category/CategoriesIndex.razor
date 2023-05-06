@@ -14,6 +14,16 @@
     </div>
 </div>
 
+<div>
+    <div class="mx-2">
+        <input style="width: 350px;" type="text" class="form-control" id="titulo" placeholder="Buscar categoría. . ." @bind-value="Filter" />
+    </div>
+    <div>
+        <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+        <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Filtrar</button>
+    </div>
+</div>
+
 <GenericList MyList="categories">
     <Body>
         <div class="m-3">
@@ -41,29 +51,83 @@
         </div>
     </Body>
 </GenericList>
+<div class="container-fluid" ml-3 mr-3>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-8">
+            <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
+        </div>
+        <div class="col-md-auto"></div>
+    </div>
+</div>
 
 @code {
     public List<Category>? categories;
+    private int currentPage = 1;
+    private int totalPages;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         await LoadAsync();
     }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(int page = 1)
     {
-        var httpResponse = await repository.GetAsync<List<Category>>("/api/categories");
-        if (httpResponse.Error)
+        var url1 = String.Empty;
+        var url2 = String.Empty;
+
+        //url1 = $"api/categories?Page={page}";
+        //url2 = $"api/categories/totalPages";
+
+        if (string.IsNullOrEmpty(Filter))
         {
-            var message = await httpResponse.GetErrorMessageAsync();
+            url1 = $"api/categories?page={page}";
+            url2 = $"api/categories/GetPages";
+        }
+        else
+        {
+            url1 = $"api/categories?page={page}&filter={Filter}";
+            url2 = $"api/categories?GetPages&filter={Filter}";
+        }
+
+        var httpResponse1 = await repository.GetAsync<List<Category>>(url1);
+        var httpResponse2 = await repository.GetAsync<int>(url2);
+
+        if (httpResponse1.Error)
+        {
+            var message = await httpResponse1.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
-        categories = httpResponse.Response;
+        categories = httpResponse1.Response;
+        totalPages = httpResponse2.Response;
     }
 
     private void DeleteAsync(int id)
     {
-        
+
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        currentPage = page;
+        await LoadAsync(page);
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        int page = 1;
+        await LoadAsync(page);
+        await SelectedPage(page);
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
     }
 }
