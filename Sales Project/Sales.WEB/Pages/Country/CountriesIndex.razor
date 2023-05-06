@@ -109,15 +109,15 @@ else
 
     private async Task LoadTotalPagesAsync()
     {
-        var url = "api/countries/GetPages";
-        //if (string.IsNullOrEmpty(Filter))
-        //{
-        //    url = "api/countries/GetPages";
-        //}
-        //else
-        //{
-        //    url = $"api/countries/GetPages?filter={Filter}";
-        //}
+        var url = string.Empty;
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url = "api/countries/GetPages";
+        }
+        else
+        {
+            url = $"api/countries/totalPages?filter={Filter}";
+        }
 
         var responseHppt = await repository.GetAsync<int>(url);
         totalPages = responseHppt.Response!;
@@ -125,29 +125,30 @@ else
 
     private async Task LoadAsync(int page = 1)
     {
-        if (!string.IsNullOrWhiteSpace(Page))
-        {
-            page = Convert.ToInt32(Page);
-        }
-
-        var url = $"api/countries?page={page}";
-        //if (string.IsNullOrEmpty(Filter))
+        //if (!string.IsNullOrWhiteSpace(Page))
         //{
-        //    url = $"api/countries?page={page}";
-        //}
-        //else
-        //{
-        //    url = $"api/countries?page={page}&filter={Filter}";
+        //    page = Convert.ToInt32(Page);
         //}
 
-        var httpResponse = await repository.GetAsync<List<Country>>(url);
-        if (httpResponse.Error)
+        var url1 = String.Empty;
+        var url2 = String.Empty;
+
+        if (string.IsNullOrEmpty(Filter))
         {
-            var message = await httpResponse.GetErrorMessageAsync();
-            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            return;
+            url1 = $"api/countries?page={page}";
+            url2 = $"api/countries/GetPages";
         }
-        countries = httpResponse.Response;
+        else
+        {
+            url1 = $"api/countries?page={page}&filter={Filter}";
+            url2 = $"api/countries?GetPages&filter={Filter}";
+        }
+
+        var httpResponse1 = await repository.GetAsync<List<Country>>(url1);
+        var httpResponse2 = await repository.GetAsync<int>(url2);
+
+        countries = httpResponse1.Response!;
+        totalPages = httpResponse2.Response!;
     }
 
     private async Task DeleteAsync(int id)

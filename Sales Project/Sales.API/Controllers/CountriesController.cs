@@ -27,16 +27,8 @@ namespace Sales.API.Controllers
                 .ToListAsync());
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult> GetAsync()
-        //{
-        //    return Ok(await _context.Countries
-        //        .Include(c => c.States)
-        //        .ToListAsync());
-        //}
-        
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetAsync(int id)
+        public async Task<ActionResult> GetByIdAsync(int id)
         {
             var country = await _context.Countries
                 .Include(c => c.States!)
@@ -62,6 +54,15 @@ namespace Sales.API.Controllers
                 .ToListAsync());
         }
 
+        [HttpGet("[action]")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Countries.AsQueryable();
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
@@ -73,15 +74,6 @@ namespace Sales.API.Controllers
             _context.Remove(country);
             await _context.SaveChangesAsync();
             return NoContent();
-        }
-
-        [HttpGet("[action]")]
-        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
-        {
-            var queryable = _context.Countries.AsQueryable();
-            double count = await queryable.CountAsync();
-            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
-            return Ok(totalPages);
         }
 
         [HttpPost]
