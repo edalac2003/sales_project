@@ -22,7 +22,6 @@ namespace Sales.Shared.Entities
             await CheckCountriesAsync();
             await CheckCategoriesAsync();
         }
-
         private async Task CheckCountriesAsync()
         {
             if (!_context.Countries.Any())
@@ -61,8 +60,6 @@ namespace Sales.Shared.Entities
                                                 if (city == null)
                                                 {
                                                     state.Cities.Add(new City() { Name = cityResponse.Name! });
-                var responseCountries = await _apiService.GetListAsync<CountryResponse>("/v1", "/countries");
-                if (responseCountries.IsSuccess)
                                                 }
                                             }
                                         }
@@ -84,7 +81,6 @@ namespace Sales.Shared.Entities
             }
         }
 
-            }
         private async Task CheckCategoriesAsync()
         {
             if (!_context.Categories.Any())
