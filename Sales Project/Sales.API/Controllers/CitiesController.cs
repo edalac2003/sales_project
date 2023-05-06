@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.API.Data;
+using Sales.API.Helpers;
+using Sales.Shared.DTOs;
 using Sales.Shared.Entities;
 
 namespace Sales.API.Controllers
@@ -16,11 +18,11 @@ namespace Sales.API.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAsync()
-        {
-            return Ok(await _context.Cities.ToListAsync());
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetAsync()
+        //{
+        //    return Ok(await _context.Cities.ToListAsync());
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
@@ -31,6 +33,31 @@ namespace Sales.API.Controllers
                 return NotFound();
             }
             return Ok(state);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Cities
+                .Where(x => x.State!.Id == pagination.Id)
+                .AsQueryable();
+
+            return Ok(await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync());
+        }
+
+        [HttpGet("totalPages")]
+        public async Task<IActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Cities
+                .Where(x => x.State!.Id == pagination.Id)
+                .AsQueryable();
+
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
         }
 
         [HttpDelete("{id}")]

@@ -3,71 +3,166 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<div class="container-fluid mt-3 mb-3">
-    <div class="row align-items-start">
-        <div class="col-md-10">
-            <h3>Paises</h3>
+@if (countries is null)
+{
+    <div class="align-items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
+    </div>
+}
+else
+{
+    <div class="container-fluid mt-3 mb-3">
+        <div class="row align-items-start">
+            <div class="col-md-auto">
+                <h3>Paises</h3>
+            </div>
         </div>
-        <div class="col" al>
-            <div class="mb-3">
-                <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                <button class="btn btn-primary">Nuevo País</button>
+            </div>
+            <div class="col-3"></div>
+            <div class="col-6">
+                <input type="text" style="width: 300px" placeholder="Algo aqui..." />
+                <button type="button" class="btn btn-outline-warning">Filtrar</button>
+                <button type="button" class="btn btn-outline-info">Limpiar</button>
             </div>
         </div>
     </div>
-</div>
+    @*<div class="container mt-3 mb-3">
+        <div class="row align-items-start">
+            <div class="d-flex flex-row">
+                <div class="mb-3">
+                    <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+                </div>
+            </div>
+            <div class="col-md-auto align-items-end">
+                <div>
+                    
+                </div>                
+            </div>
+            <div class="col-md-6 align-items-start">
+                <div>
+                    <input style="width: 300px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
+                    <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+                    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+                </div>
+            </div>
+        </div>
+    </div>*@
 
-<Pagination CurrentPage="currentPage"
-            TotalPages="totalPages"
-            SelectedPage="SelectedPage" />
-
-<GenericList MyList="countries">
-    <Body>
-        <div class="m-4">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th width="50%" style="align" >País</th>
-                        <th width="25%">Estados/Departamentos</th>
-                        <th width="25%"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var country in countries!)
-                    {
+    <GenericList MyList="countries">
+        <Body>
+            <div class="m-4">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td width="50%">@country.Name</td>
-                            <td width="25%"></td>
-                            <td width="25%">
-                                <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
-                                <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
-                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.Id))>Borrar</button>
-                            </td>
+                            <th width="50%">País</th>
+                            <th width="25%" style="text-align:center">Estados/Departamentos</th>
+                            <th width="25%" style="text-align:center">Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>        
-    </Body>
-</GenericList>
+                    </thead>
+                    <tbody>
+                        @foreach (var country in countries!)
+                        {
+                            <tr>
+                                <td width="50%">@country.Name</td>
+                                <td width="25%" style="text-align:center">@country.StatesNumber</td>
+                                <td width="25%">
+                                    <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
+                                    <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
+                                    <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country.Id))>Borrar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </Body>
+    </GenericList>
+    <div class="container-fluid" ml-3 mr-3>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-8">
+                <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
+            </div>
+            <div class="col-md-auto"></div>
+        </div>
+    </div>
+}
+
+
 
 @code {
-    private List<Country>? countries;
+    public List<Country>? countries;
+    private int currentPage = 1;
+    private int totalPages;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Page { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadTotalPagesAsync();
         await LoadAsync();
     }
 
-    private async Task LoadAsync()
+    private async Task SelectedPage(int page)
     {
-        var httpResponse = await repository.GetAsync<List<Country>>("/api/countries");
-        if (httpResponse.Error)
+        currentPage = page;
+        await LoadAsync(page);
+    }
+
+    private async Task LoadTotalPagesAsync()
+    {
+        var url = string.Empty;
+        if (string.IsNullOrEmpty(Filter))
         {
-            var message = await httpResponse.GetErrorMessageAsync();
-            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            return;
+            url = "api/countries/GetPages";
         }
-        countries = httpResponse.Response;
+        else
+        {
+            url = $"api/countries/GetPages?filter={Filter}";
+        }
+
+        var responseHppt = await repository.GetAsync<int>(url);
+        totalPages = responseHppt.Response!;
+    }
+
+    private async Task LoadAsync(int page = 1)
+    {
+        //if (!string.IsNullOrWhiteSpace(Page))
+        //{
+        //    page = Convert.ToInt32(Page);
+        //}
+
+        var url1 = String.Empty;
+        var url2 = String.Empty;
+
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url1 = $"api/countries?page={page}";
+            url2 = $"api/countries/GetPages";
+        }
+        else
+        {
+            url1 = $"api/countries?page={page}&filter={Filter}";
+            url2 = $"api/countries?GetPages&filter={Filter}";
+        }
+
+        var httpResponse1 = await repository.GetAsync<List<Country>>(url1);
+        var httpResponse2 = await repository.GetAsync<int>(url2);
+
+        countries = httpResponse1.Response!;
+        totalPages = httpResponse2.Response!;
     }
 
     private async Task DeleteAsync(int id)
@@ -108,5 +203,19 @@
                 Timer = 5000
             });
         await toast.FireAsync(icon: SweetAlertIcon.Success, message: "País eliminado con éxito.");
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        int page = 1;
+        await LoadTotalPagesAsync();
+        await LoadAsync(page);
+        await SelectedPage(page);
     }
 }

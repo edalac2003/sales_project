@@ -1,27 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.API.Data;
+using Sales.API.Helpers;
+using Sales.Shared.DTOs;
 using Sales.Shared.Entities;
 
 namespace Sales.API.Controllers
 {
     [ApiController]
     [Route("api/states")]
-    public class StatesController: ControllerBase
+    public class StatesController : ControllerBase
     {
         private readonly DataContext _context;
 
         public StatesController(DataContext context)
         {
             _context = context;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAsync()
-        {
-            return Ok(await _context.States
-                .Include(s => s.Cities)
-                .ToListAsync());
         }
 
         [HttpGet("{id}")]
@@ -36,6 +30,21 @@ namespace Sales.API.Controllers
             }
             return Ok(state);
         }
+
+        [HttpGet]
+        public async Task<ActionResult> Get([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.States
+                .Include(s => s.Cities)
+                .Where(s => s.Country!.Id == pagination.Id)
+                .AsQueryable();
+
+            return Ok(await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync());
+        }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
@@ -101,5 +110,18 @@ namespace Sales.API.Controllers
                 return BadRequest(exception.Message);
             }
         }
+
+        [HttpGet("[action]")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.States
+                .Where(x => x.Country!.Id == pagination.Id)
+                .AsQueryable();
+
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
+        }
+
     }
 }

@@ -18,14 +18,6 @@ namespace Sales.API.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAsync()
-        {
-            return Ok(await _context.Countries
-                .Include(c => c.States)
-                .ToListAsync());
-        }
-
         [HttpGet("[action]")]
         public async Task<ActionResult> GetFull()
         {
@@ -36,7 +28,7 @@ namespace Sales.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetAsync(int id)
+        public async Task<ActionResult> GetByIdAsync(int id)
         {
             var country = await _context.Countries
                 .Include(c => c.States!)
@@ -49,11 +41,11 @@ namespace Sales.API.Controllers
             return Ok(country);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]
         public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
-            var querable = _context.Countries
-                .Include(c => c.States)
+            var queryable = _context.Countries
+                .Include(x => x.States)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))

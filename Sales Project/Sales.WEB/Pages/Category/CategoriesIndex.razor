@@ -3,67 +3,171 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<div class="row align-items-start">
-    <div class="col-md-10">
-        <h3>Categorías</h3>
+@if (categories is null)
+{
+    <div class="align-items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
     </div>
-    <div class="col" al>
-        <div class="mb-3">
-            <a class="btn btn-primary" href="/category/create">Nueva Categoria</a>
+}
+else
+{
+    <div class="row align-items-start">
+        <div class="col-md-10">
+            <h3>Categorías</h3>
+        </div>
+        <div class="col" al>
+            <div class="mb-3">
+                <a class="btn btn-primary" href="/category/create">Nueva Categoria</a>
+            </div>
         </div>
     </div>
-</div>
 
-<GenericList MyList="categories">
-    <Body>
-        <div class="m-3">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th width="70%">Categoría</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var category in categories!)
-                    {
-                        <tr>
-                            <td>@category.Name</td>
-                            <td>
-                                <a href="/categories/edit/@category.Id" class="btn btn-warning">Editar</a>
-                                <a href="/categories/details/@category.Id" class="btn btn-info">Detalles</a>
-                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(category.Id))>Borrar</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <input style="width: 98%;" type="text" class="form-control" id="titulo" placeholder="Buscar categoría. . ." @bind-value="Filter" />
+            </div>
+            <div class="col-6 ml-4">
+                <div>
+                    <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+                    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+                </div>                
+                <div class="m-2">
+                   
+                </div>
+            </div>
         </div>
-    </Body>
-</GenericList>
+    </div>
+    <GenericList MyList="categories">
+        <Body>
+            <div class="m-3">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th width="70%">Categoría</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in categories!)
+                        {
+                            <tr>
+                                <td>@category.Name</td>
+                                <td>
+                                    <a href="/categories/edit/@category.Id" class="btn btn-warning">Editar</a>
+                                    <a href="/categories/details/@category.Id" class="btn btn-info">Detalles</a>
+                                    <button class="btn btn-danger" @onclick=@(() => DeleteAsync(category.Id))>Borrar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </Body>
+    </GenericList>
+    <div class="container-fluid" ml-3 mr-3>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-8">
+                <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
+            </div>
+            <div class="col-md-auto"></div>
+        </div>
+    </div>
+}
 
 @code {
     public List<Category>? categories;
+    private int currentPage = 1;
+    private int totalPages;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Page { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = "";
+
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadTotalPagesAsync();
         await LoadAsync();
     }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(int page = 1)
     {
-        var httpResponse = await repository.GetAsync<List<Category>>("/api/categories");
-        if (httpResponse.Error)
+        var url1 = String.Empty;
+        var url2 = String.Empty;
+
+        if (!string.IsNullOrWhiteSpace(Page))
         {
-            var message = await httpResponse.GetErrorMessageAsync();
+            page = Convert.ToInt32(Page);
+        }
+
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url1 = $"api/categories?page={page}";
+            url2 = $"api/categories/totalPages";
+        }
+        else
+        {
+            url1 = $"api/categories?page={page}&filter={Filter}";
+            url2 = $"api/categories/totalPages?Filter={Filter}";
+        }
+
+        var httpResponse1 = await repository.GetAsync<List<Category>>(url1);
+        var httpResponse2 = await repository.GetAsync<int>(url2);
+
+        if (httpResponse1.Error)
+        {
+            var message = await httpResponse1.GetErrorMessageAsync();
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
-        categories = httpResponse.Response;
+        categories = httpResponse1.Response;
+        totalPages = httpResponse2.Response;
     }
 
     private void DeleteAsync(int id)
     {
-        
+
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        currentPage = page;
+        await LoadAsync(page);
+    }
+
+    private async Task LoadTotalPagesAsync()
+    {
+        var url = string.Empty;
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url = $"api/categories/totalPages";
+        }
+        else
+        {
+            url = $"api/categories/totalPages?Filter={Filter}";
+        }
+
+        var responseHppt = await repository.GetAsync<int>(url);
+        totalPages = responseHppt.Response!;
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        int page = 1;
+        await LoadTotalPagesAsync();
+        await LoadAsync(page);
+        await SelectedPage(page);
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
     }
 }
