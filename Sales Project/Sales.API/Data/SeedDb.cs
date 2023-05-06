@@ -1,10 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sales.API.Controllers;
 using Sales.API.Data;
 using Sales.API.Services;
-using Sales.Shared.Entities;
 using Sales.Shared.Responses;
-using System.Diagnostics.Metrics;
 
 namespace Sales.Shared.Entities
 {
@@ -55,7 +52,7 @@ namespace Sales.Shared.Entities
                                             List<CityResponse> cities = responseCities.Result!;
                                             foreach (CityResponse cityResponse in cities)
                                             {
-                                                if (cityResponse.Name == cityResponse.Name!)
+                                                if (cityResponse.Name == "Mosfellsbær" || cityResponse.Name == "Șăulița")
                                                 {
                                                     continue;
                                                 }
@@ -80,7 +77,7 @@ namespace Sales.Shared.Entities
                             await _context.SaveChangesAsync();
                         }
                     }
-                }               
+                }
             }
         }
 

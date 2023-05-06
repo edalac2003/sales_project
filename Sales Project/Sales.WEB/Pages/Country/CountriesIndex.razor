@@ -116,7 +116,7 @@ else
         }
         else
         {
-            url = $"api/countries/totalPages?filter={Filter}";
+            url = $"api/countries/GetPages?filter={Filter}";
         }
 
         var responseHppt = await repository.GetAsync<int>(url);
