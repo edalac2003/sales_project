@@ -5,13 +5,17 @@
 
 @if (country is null)
 {
-    <div class="align-items-center">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?20151024034921" />
+            </div>
+        </div>
     </div>
 }
 else
 {
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-7 pl-4">
                 <h3><b>@country.Name</b></h3>
@@ -23,8 +27,6 @@ else
                 </div>
             </div>
         </div>
-    </div>
-    <div class="container">
         <div class="row mt-4">
             <div class="col-4">
                 <input style="width: 99%;" type="text" class="form-control" id="titulo" placeholder="Buscar estado. . ." @bind-value="Filter" />
@@ -108,12 +110,12 @@ else
         if (string.IsNullOrEmpty(Filter))
         {
             url1 = $"api/states?Id={Id}&page={page}";
-            url2 = $"api/states/totalPages";
+            url2 = $"api/states/totalPages?Id={Id}";
         }
         else
         {
             url1 = $"api/states?Id={Id}&page={page}&Filter={Filter}";
-            url2 = $"api/states/totalPages?Filter={Filter}";
+            url2 = $"api/states/totalPages?Id={Id}&Filter={Filter}";
         }
 
         var responseHttp1 = await repository.GetAsync<Country>($"api/countries/{Id}");
@@ -167,11 +169,11 @@ else
         var url = string.Empty;
         if (string.IsNullOrEmpty(Filter))
         {
-            url = $"api/categories/totalPages";
+            url = $"api/states/totalPages?Id={Id}";
         }
         else
         {
-            url = $"api/categories/totalPages?Filter={Filter}";
+            url = $"api/states/totalPages?Id={Id}&Filter={Filter}";
         }
 
         var responseHppt = await repository.GetAsync<int>(url);
