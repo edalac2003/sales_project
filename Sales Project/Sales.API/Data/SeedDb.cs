@@ -32,31 +32,31 @@ namespace Sales.Shared.Entities
                     List<CountryResponse> countries = responseCountries.Result!;
                     foreach (CountryResponse countryResponse in countries)
                     {
-                        Country country = await _context.Countries!.FirstOrDefaultAsync(c => c.Name == countryResponse.Name!)!;
+                        var country = await _context.Countries!.FirstOrDefaultAsync(c => c.Name == countryResponse.Name!)!;
                         if (country == null)
                         {
                             country = new() { Name = countryResponse.Name!, States = new List<State>() };
-                            Response<List<StateResponse>> responseStates = await _apiService.GetListAsync<StateResponse>("/v1", $"/countries/{countryResponse.Iso2}/states");
+                            var responseStates = await _apiService.GetListAsync<StateResponse>("/v1", $"/countries/{countryResponse.Iso2}/states");
                             if (responseStates.IsSuccess)
                             {
                                 List<StateResponse> states = responseStates.Result!;
                                 foreach (StateResponse stateResponse in states)
                                 {
-                                    State state = country.States!.FirstOrDefault(s => s.Name == stateResponse.Name!)!;
+                                    var state = country.States!.FirstOrDefault(s => s.Name == stateResponse.Name!)!;
                                     if (state == null)
                                     {
                                         state = new() { Name = stateResponse.Name!, Cities = new List<City>() };
-                                        Response<List<CityResponse>> responseCities = await _apiService.GetListAsync<CityResponse>("/v1", $"/countries/{countryResponse.Iso2}/states/{stateResponse.Iso2}/cities");
+                                        var responseCities = await _apiService.GetListAsync<CityResponse>("/v1", $"/countries/{countryResponse.Iso2}/states/{stateResponse.Iso2}/cities");
                                         if (responseCities.IsSuccess)
                                         {
-                                            List<CityResponse> cities = responseCities.Result!;
+                                            var cities = responseCities.Result!;
                                             foreach (CityResponse cityResponse in cities)
                                             {
                                                 if (cityResponse.Name == "Mosfellsbær" || cityResponse.Name == "Șăulița")
                                                 {
                                                     continue;
                                                 }
-                                                City city = state.Cities!.FirstOrDefault(c => c.Name == cityResponse.Name!)!;
+                                                var city = state.Cities!.FirstOrDefault(c => c.Name == cityResponse.Name!)!;
                                                 if (city == null)
                                                 {
                                                     state.Cities.Add(new City() { Name = cityResponse.Name! });

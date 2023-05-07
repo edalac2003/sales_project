@@ -11,30 +11,29 @@
 }
 else
 {
-    <div class="container-fluid mt-3">
-        <div class="row align-items-start">
-            <div class="col-md-10">
-                <h3>@state.Name</h3>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <h3><b>@state.Name</b></h3>
             </div>
-            <div class="col" al>
-                <div class="mb-2">
+            <div class="col-md-4">
+                <div class="mb-3">
                     <a class="btn btn-primary" href="/cities/create/@state.Id">Nueva ciudad</a>
+                    <a class="btn btn-success" href="/countries/details/@state.CountryId">Regresar</a>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="container">
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-4">
-                <input style="width: 98%;" type="text" class="form-control" id="titulo" placeholder="Buscar ciudad. . ." @bind-value="Filter" />
+                <input style="width: 99%;" type="text" class="form-control" id="titulo" placeholder="Buscar ciudad. . ." @bind-value="Filter" />
             </div>
-            <div class="col-6 ml-4">
+            <div class="col-6 ml-1">
                 <div>
                     <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
                     <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
-                </div>
-                <div class="m-2">
                 </div>
             </div>
         </div>
@@ -42,7 +41,7 @@ else
     
     <GenericList MyList="cities!">
         <Body>
-            <div class="m-4">
+            <div class="mx-3">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -70,15 +69,10 @@ else
     </GenericList>
     <div class="container-fluid" ml-3 mr-3>
         <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
             </div>
-            <div class="col-md-auto"></div>
         </div>
-    </div>
-    <div class="mt-2">
-        <a class="btn btn-success" href="/countries/details/@state.CountryId">Regresar</a>
     </div>
 }
 

@@ -11,37 +11,36 @@
 }
 else
 {
-    <div class="row align-items-start">
-        <div class="col-md-10">
-            <h3>Paises</h3>
-        </div>
-        <div class="col" al>
-            <div class="mb-3">
-                <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <h3><b>Paises</b></h3>
+            </div>
+            <div class="col" al>
+                <div class="mb-3">
+                    <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+                </div>
             </div>
         </div>
     </div>
-
     <div class="container">
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-4">
-                <input style="width: 98%;" type="text" class="form-control" id="titulo" placeholder="Buscar país. . ." @bind-value="Filter" />
+                <input style="width: 99%;" type="text" class="form-control" id="titulo" placeholder="Buscar país. . ." @bind-value="Filter" />
             </div>
-            <div class="col-6 ml-4">
+            <div class="col-6 ml-2">
                 <div>
                     <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
                     <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
                 </div>                
-                <div class="m-2">
-                   
-                </div>
+                
             </div>
         </div>
     </div>
 
     <GenericList MyList="countries">
         <Body>
-            <div class="m-4">
+            <div class="mx-3">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -70,11 +69,9 @@ else
     </GenericList>
     <div class="container-fluid" ml-3 mr-3>
         <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <Pagination CurrentPage="currentPage" SelectedPage="SelectedPage" TotalPages="totalPages"></Pagination>
             </div>
-            <div class="col-md-auto"></div>
         </div>
     </div>
 }

@@ -18,12 +18,6 @@ namespace Sales.API.Controllers
             _context = context;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAsync()
-        //{
-        //    return Ok(await _context.Cities.ToListAsync());
-        //}
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
         {
