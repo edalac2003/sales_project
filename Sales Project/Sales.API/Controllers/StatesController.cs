@@ -39,6 +39,11 @@ namespace Sales.API.Controllers
                 .Where(s => s.Country!.Id == pagination.Id)
                 .AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(c => c.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+
             return Ok(await queryable
                 .OrderBy(x => x.Name)
                 .Paginate(pagination)
@@ -111,12 +116,17 @@ namespace Sales.API.Controllers
             }
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("totalPages")]
         public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
         {
             var queryable = _context.States
                 .Where(x => x.Country!.Id == pagination.Id)
                 .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(c => c.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
 
             double count = await queryable.CountAsync();
             double totalPages = Math.Ceiling(count / pagination.RecordsNumber);

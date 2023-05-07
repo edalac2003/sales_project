@@ -23,6 +23,22 @@ else
             </div>
         </div>
     </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <input style="width: 98%;" type="text" class="form-control" id="titulo" placeholder="Buscar ciudad. . ." @bind-value="Filter" />
+            </div>
+            <div class="col-6 ml-4">
+                <div>
+                    <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+                    <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+                </div>
+                <div class="m-2">
+                </div>
+            </div>
+        </div>
+    </div>
     
     <GenericList MyList="cities!">
         <Body>
@@ -75,15 +91,36 @@ else
     [Parameter]
     public int Id { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Page { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Filter { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
+        await LoadTotalPagesAsync();
         await LoadAsync();
     }
 
     private async Task LoadAsync(int page = 1)
     {
-        string url1 = $"api/cities?Id={Id}&page={page}";
-        string url2 = $"api/cities/totalPages?Id={Id}";
+        string url1 = string.Empty;
+        string url2 = string.Empty;
+
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url1 = $"api/cities?Id={Id}&page={page}";
+            url2 = $"api/cities/totalPages?Id={Id}";
+        }
+        else
+        {
+            url1 = $"api/cities?Id={Id}&page={page}&Filter={Filter}";
+            url2 = $"api/cities/totalPages?Id={Id}&Filter={Filter}";
+        }
+
         var responseHttp1 = await repository.GetAsync<State>($"api/states/{Id}");
         var responseHttp2 = await repository.GetAsync<List<City>>(url1);
         var responseHttp3 = await repository.GetAsync<int>(url2);
@@ -138,6 +175,35 @@ else
         await LoadAsync(page);
     }
 
+    private async Task LoadTotalPagesAsync()
+    {
+        var url = string.Empty;
+        if (string.IsNullOrEmpty(Filter))
+        {
+            url = $"api/cities/totalPages?Id={Id}";
+        }
+        else
+        {
+            url = $"api/cities/totalPages?Id={Id}&Filter={Filter}";
+        }
+
+        var responseHppt = await repository.GetAsync<int>(url);
+        totalPages = responseHppt.Response!;
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        int page = 1;
+        await LoadTotalPagesAsync();
+        await LoadAsync(page);
+        await SelectedPage(page);
+    }
+
+    private async Task CleanFilterAsync()
+    {
+        Filter = string.Empty;
+        await ApplyFilterAsync();
+    }
     
     private void Return()
     {
